@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Hairdresser {
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  phone           String
+  bio             String?
+  yearsOfExperience Int?
+  dbsVerified     Boolean   @default(false)
+  
+  // Service area: center point + radius (in meters)
+  serviceCenterLat Float
+  serviceCenterLng Float
+  serviceRadiusM  Int       @default(5000)
+  
+  // Relations
+  services        Service[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Service {
+  id              String    @id @default(cuid())
+  name            String
+  price           Float
+  durationMinutes Int
+  
+  hairdresser     Hairdresser @relation(fields: [hairdresserId], references: [id], onDelete: Cascade)
+  hairdresserId   String
+  
+  createdAt       DateTime  @default(now())
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  
+  // User's location for search
+  lat             Float?
+  lng             Float?
+  
+  createdAt       DateTime  @default(now())
+}
