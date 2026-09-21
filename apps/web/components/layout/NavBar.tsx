@@ -14,7 +14,7 @@ interface NavBarProps {
 
 export const NavBar = ({ links }: NavBarProps) => {
   return (
-    <NavigationMenu className="max-w-full p-4 bg-primary">
+    <NavigationMenu className="max-w-full p-4 bg-foreground">
       <NavigationMenuList className="w-full flex gap-3 h-full">
         {links.map((link: NavBarLink) => (
           <NavigationMenuItem key={link.name}>
