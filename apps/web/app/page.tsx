@@ -12,14 +12,14 @@ export default function Home() {
     <>
       <Hero
         image="/images/heroImage.jpg"
-        title="Your stylist at your door"
+        title="Your stylist, at your door"
         description="Mobile. Professional. Personal."
       >
         <Field>
           <ButtonGroup>
             <Input
               id="input-button-group"
-              placeholder="Type to search..."
+              placeholder="Your postcode or address..."
               className="h-12 bg-background"
             />
             <Button
@@ -33,7 +33,7 @@ export default function Home() {
       </Hero>
       <WhyChooseUs />
       <HowItWorks />
-      <RegisterAsAHairdresser/>
+      <RegisterAsAHairdresser />
     </>
   );
 }
