@@ -1,7 +1,9 @@
 import express from "express";
+import { registerRoute } from "./routes/register.route";
 
 const app = express();
 app.use(express.json());
+app.use("/api", registerRoute);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
