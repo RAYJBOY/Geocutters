@@ -4,21 +4,88 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { StepOne } from "@/components/features/register/StepOne";
 import { StepTwo } from "@/components/features/register/StepTwo";
+import StepThree from "@/components/features/register/StepThree";
+import StepFour from "@/components/features/register/StepFour";
 
 const STEPS = ["Your info", "Service area", "Services", "Details"];
+
+type Service = {
+  name: string;
+  price: string;
+  duration: string;
+};
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
 
-  // Form state
+  // Step 1: Personal info
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
+  // Step 2: Service area
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [radius, setRadius] = useState(5000);
+
+  // Step 3: Services
+  const [services, setServices] = useState<Service[]>([
+    { name: "", price: "", duration: "" },
+  ]);
+
+  // Step 4: Details
+  const [bio, setBio] = useState("");
+  const [experience, setExperience] = useState<string | null>(null);
+  const [dbs, setDbs] = useState(false);
+
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
-  const handleSubmit = () => setSubmitted(true);
+
+  const handleSubmit = async () => {
+    // Collect all form data
+    const formData = {
+      name,
+      email,
+      phone,
+      lat,
+      lng,
+      radius,
+      services,
+      bio,
+      experience,
+      dbs,
+    };
+
+    console.log("Submitting:", formData);
+
+    // Send to your API
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+      }
+    } catch (error) {
+      console.error("Failed to submit:", error);
+    }
+  };
+
+  const addService = () =>
+    setServices((prev) => [...prev, { name: "", price: "", duration: "" }]);
+
+  const removeService = (i: number) =>
+    setServices((prev) => prev.filter((_, idx) => idx !== i));
+
+  const updateService = (i: number, field: keyof Service, val: string) => {
+    setServices((prev) =>
+      prev.map((s, idx) => (idx === i ? { ...s, [field]: val } : s)),
+    );
+  };
 
   if (submitted) {
     return (
@@ -105,7 +172,16 @@ export default function RegisterPage() {
             <p className="text-muted-foreground text-sm mb-6">
               How far are you willing to travel?
             </p>
-            <StepTwo onNext={handleNext} onBack={handleBack} />
+            <StepTwo
+              lat={lat}
+              setLat={setLat}
+              lng={lng}
+              setLng={setLng}
+              radius={radius}
+              setRadius={setRadius}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
           </div>
         )}
 
@@ -118,14 +194,14 @@ export default function RegisterPage() {
             <p className="text-muted-foreground text-sm mb-6">
               Add the services you offer.
             </p>
-            <div className="flex gap-3 mt-8">
-              <Button variant="outline" onClick={handleBack} className="flex-1">
-                Back
-              </Button>
-              <Button onClick={handleNext} className="flex-1">
-                Continue
-              </Button>
-            </div>
+            <StepThree
+              services={services}
+              onAddService={addService}
+              onRemoveService={removeService}
+              onUpdateService={updateService}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
           </div>
         )}
 
@@ -138,14 +214,16 @@ export default function RegisterPage() {
             <p className="text-muted-foreground text-sm mb-6">
               Complete your profile.
             </p>
-            <div className="flex gap-3 mt-8">
-              <Button variant="outline" onClick={handleBack} className="flex-1">
-                Back
-              </Button>
-              <Button onClick={handleSubmit} className="flex-1 bg-primary">
-                Submit
-              </Button>
-            </div>
+            <StepFour
+              bio={bio}
+              setBio={setBio}
+              experience={experience}
+              setExperience={setExperience}
+              dbs={dbs}
+              setDbs={setDbs}
+              onSubmit={handleSubmit}
+              onBack={handleBack}
+            />
           </div>
         )}
       </div>

@@ -12,17 +12,28 @@ type SearchResult = {
 };
 
 type StepTwoProps = {
+  lat: number | null;
+  setLat: (lat: number) => void;
+  lng: number | null;
+  setLng: (lng: number) => void;
+  radius: number;
+  setRadius: (radius: number) => void;
   onNext: () => void;
   onBack: () => void;
 };
 
-export const StepTwo = ({ onNext, onBack }: StepTwoProps) => {
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
-  const [radius, setRadius] = useState(5000);
-  const [address, setAddress] = useState("");
+export const StepTwo = ({
+  lat,
+  setLat,
+  lng,
+  setLng,
+  radius,
+  setRadius,
+  onNext,
+  onBack,
+}: StepTwoProps) => {
   const [loading, setLoading] = useState(true);
-  const [geocoding, setGeocoding] = useState(false);
+  const [address, setAddress] = useState("");
   const [error, setError] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
 
@@ -49,7 +60,6 @@ export const StepTwo = ({ onNext, onBack }: StepTwoProps) => {
     }
 
     const timer = setTimeout(async () => {
-      setGeocoding(true);
       setError("");
 
       try {
@@ -66,7 +76,6 @@ export const StepTwo = ({ onNext, onBack }: StepTwoProps) => {
       } catch (err) {
         setError("Failed to search address");
       }
-      setGeocoding(false);
     }, 500);
 
     return () => clearTimeout(timer);
