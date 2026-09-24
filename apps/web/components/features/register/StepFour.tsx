@@ -4,33 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface StepFourProps {
   bio: string;
   setBio: (bio: string) => void;
-  experience: string | null;
-  setExperience: (experience: string | null) => void;
+  experience: number | null;
+  setExperience: (experience: number | null) => void;
   dbs: boolean;
   setDbs: (dbs: boolean) => void;
   onSubmit: () => void;
   onBack: () => void;
 }
-
-const EXPERIENCE_OPTIONS = [
-  "Less than 1 year",
-  "1–2 years",
-  "3–5 years",
-  "6–10 years",
-  "10+ years",
-];
 
 export default function StepFour({
   bio,
@@ -72,23 +57,23 @@ export default function StepFour({
           </div>
         </div>
 
-        {/* Experience Dropdown */}
+        {/* Experience */}
         <div>
           <Label htmlFor="experience" className="text-sm font-semibold">
             Years of experience
           </Label>
-          <Select value={experience} onValueChange={setExperience}>
-            <SelectTrigger id="experience" className="mt-1.5">
-              <SelectValue placeholder="Select years" />
-            </SelectTrigger>
-            <SelectContent>
-              {EXPERIENCE_OPTIONS.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            id="experience"
+            type="number"
+            min={0}
+            step={1}
+            placeholder="e.g. 5"
+            value={experience ?? ""}
+            onChange={(e) =>
+              setExperience(e.target.value === "" ? null : Number(e.target.value))
+            }
+            className="mt-1.5"
+          />
         </div>
 
         {/* Bio Textarea */}

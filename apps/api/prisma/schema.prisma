@@ -16,7 +16,8 @@ model Hairdresser {
   id              String    @id @default(cuid())
   name            String
   email           String    @unique
-  phone           String
+  password        String
+  phone           String?
   bio             String?
   yearsOfExperience Int?
   dbsVerified     Boolean   @default(false)

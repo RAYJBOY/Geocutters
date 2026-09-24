@@ -8,7 +8,6 @@ import {
 
 export async function registerController(req: Request, res: Response) {
   try {
-    console.log('HAMZA: inside controller')
     const hairdresser = await registerHairdresser(req.body as RegisterPayload);
     res.status(201).json({ hairdresser });
   } catch (error) {

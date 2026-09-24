@@ -3,18 +3,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
-
-interface Service {
-  name: string;
-  price: string;
-  duration: string;
-}
+import type { RegistrationService } from "@geocutters/shared";
 
 interface StepThreeProps {
-  services: Service[];
+  services: RegistrationService[];
   onAddService: () => void;
   onRemoveService: (index: number) => void;
-  onUpdateService: (index: number, field: keyof Service, value: string) => void;
+  onUpdateService: (
+    index: number,
+    field: keyof RegistrationService,
+    value: string,
+  ) => void;
   onNext: () => void;
   onBack: () => void;
 }

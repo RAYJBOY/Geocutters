@@ -1,17 +1,7 @@
 import { prisma } from "../../lib/prisma.js";
+import type { RegisterRequest } from "@geocutters/shared";
 
-export type RegisterPayload = {
-  name: unknown;
-  email: unknown;
-  phone: unknown;
-  lat: unknown;
-  lng: unknown;
-  radius: unknown;
-  services: unknown;
-  bio: unknown;
-  experience: unknown;
-  dbs: unknown;
-};
+export type RegisterPayload = RegisterRequest;
 
 type NormalizedService = {
   name: string;
@@ -22,7 +12,8 @@ type NormalizedService = {
 type NormalizedRegistration = {
   name: string;
   email: string;
-  phone: string;
+  password: string;
+  phone?: string;
   serviceCenterLat: number;
   serviceCenterLng: number;
   serviceRadiusM: number;
@@ -33,14 +24,6 @@ type NormalizedRegistration = {
 };
 
 export class RegistrationValidationError extends Error {}
-
-const experienceYears: Record<string, number> = {
-  "Less than 1 year": 0,
-  "1–2 years": 2,
-  "3–5 years": 5,
-  "6–10 years": 10,
-  "10+ years": 10,
-};
 
 function requiredString(value: unknown, field: string): string {
   if (typeof value !== "string" || value.trim() === "") {
@@ -79,11 +62,9 @@ function normalizeExperience(value: unknown): number | undefined {
     return value;
   }
 
-  if (typeof value === "string" && value in experienceYears) {
-    return experienceYears[value];
-  }
-
-  throw new RegistrationValidationError("experience is invalid");
+  throw new RegistrationValidationError(
+    "experience must be a non-negative integer",
+  );
 }
 
 function normalizePayload(payload: RegisterPayload): NormalizedRegistration {
@@ -115,17 +96,21 @@ function normalizePayload(payload: RegisterPayload): NormalizedRegistration {
   const bio = payload.bio === undefined || payload.bio === null
     ? undefined
     : requiredString(payload.bio, "bio");
+  const phone = payload.phone === null || payload.phone === undefined || payload.phone === ""
+    ? undefined
+    : requiredString(payload.phone, "phone");
   const yearsOfExperience = normalizeExperience(payload.experience);
 
   return {
     name: requiredString(payload.name, "name"),
     email,
-    phone: requiredString(payload.phone, "phone"),
+    password: requiredString(payload.password, "password"),
     serviceCenterLat: finiteNumber(payload.lat, "lat"),
     serviceCenterLng: finiteNumber(payload.lng, "lng"),
     serviceRadiusM: positiveInteger(payload.radius, "radius"),
     services,
     ...(bio === undefined ? {} : { bio }),
+    ...(phone === undefined ? {} : { phone }),
     ...(yearsOfExperience === undefined ? {} : { yearsOfExperience }),
     dbsVerified: payload.dbs === true,
   };

@@ -1,4 +1,4 @@
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -8,8 +8,10 @@ type StepOneProps = {
   setName: (value: string) => void;
   email: string;
   setEmail: (value: string) => void;
-  phone: string;
-  setPhone: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  confirmPassword: string;
+  setConfirmPassword: (value: string) => void;
   onNext: () => void;
 };
 
@@ -18,12 +20,23 @@ export const StepOne = ({
   setName,
   email,
   setEmail,
-  phone,
-  setPhone,
+  password,
+  setPassword,
+  confirmPassword,
+  setConfirmPassword,
   onNext,
 }: StepOneProps) => {
+  const [passwordError, setPasswordError] = useState("");
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+
+    setPasswordError("");
     onNext();
   };
 
@@ -56,16 +69,39 @@ export const StepOne = ({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="form-phone">Phone *</FieldLabel>
+          <FieldLabel htmlFor="form-password">Password *</FieldLabel>
           <Input
-            id="form-phone"
+            id="form-password"
             required
-            type="tel"
-            placeholder="+44 01234567890"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            type="password"
+            placeholder="Create a password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="bg-background"
           />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="form-confirm-password">
+            Repeat password *
+          </FieldLabel>
+          <Input
+            id="form-confirm-password"
+            required
+            type="password"
+            placeholder="Repeat your password"
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setPasswordError("");
+            }}
+            className="bg-background"
+          />
+          {passwordError && (
+            <p className="text-sm text-destructive" role="alert">
+              {passwordError}
+            </p>
+          )}
         </Field>
 
         <div className="flex gap-3 mt-8 pt-6 border-t border-border">

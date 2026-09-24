@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { RegistrationService } from "@geocutters/shared";
 import { Button } from "@/components/ui/button";
 import { StepOne } from "@/components/features/register/StepOne";
 import { StepTwo } from "@/components/features/register/StepTwo";
@@ -9,12 +10,6 @@ import StepFour from "@/components/features/register/StepFour";
 
 const STEPS = ["Your info", "Service area", "Services", "Details"];
 
-type Service = {
-  name: string;
-  price: string;
-  duration: string;
-};
-
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
@@ -22,7 +17,8 @@ export default function RegisterPage() {
   // Step 1: Personal info
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Step 2: Service area
   const [lat, setLat] = useState<number | null>(null);
@@ -30,13 +26,13 @@ export default function RegisterPage() {
   const [radius, setRadius] = useState(5000);
 
   // Step 3: Services
-  const [services, setServices] = useState<Service[]>([
+  const [services, setServices] = useState<RegistrationService[]>([
     { name: "", price: "", duration: "" },
   ]);
 
   // Step 4: Details
   const [bio, setBio] = useState("");
-  const [experience, setExperience] = useState<string | null>(null);
+  const [experience, setExperience] = useState<number | null>(null);
   const [dbs, setDbs] = useState(false);
 
   const handleNext = () => setStep(step + 1);
@@ -47,7 +43,8 @@ export default function RegisterPage() {
     const formData = {
       name,
       email,
-      phone,
+      password,
+      phone: null,
       lat,
       lng,
       radius,
@@ -81,7 +78,11 @@ export default function RegisterPage() {
   const removeService = (i: number) =>
     setServices((prev) => prev.filter((_, idx) => idx !== i));
 
-  const updateService = (i: number, field: keyof Service, val: string) => {
+  const updateService = (
+    i: number,
+    field: keyof RegistrationService,
+    val: string,
+  ) => {
     setServices((prev) =>
       prev.map((s, idx) => (idx === i ? { ...s, [field]: val } : s)),
     );
@@ -156,8 +157,10 @@ export default function RegisterPage() {
               setName={setName}
               email={email}
               setEmail={setEmail}
-              phone={phone}
-              setPhone={setPhone}
+              password={password}
+              setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
               onNext={handleNext}
             />
           </div>
