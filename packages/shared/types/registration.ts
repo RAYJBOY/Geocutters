@@ -16,4 +16,23 @@ export type RegisterRequest = {
   bio: string;
   experience: number | null;
   dbs: boolean;
+  verificationToken: string;
+};
+
+export type CompleteRegistrationRequest = {
+  phone: string | null;
+  lat: number | null;
+  lng: number | null;
+  radius: number;
+  services: RegistrationService[];
+  bio: string;
+  experience: number | null;
+  dbs: boolean;
+  verificationToken: string;
+};
+
+export type RequestVerification = {
+  name: string;
+  email: string;
+  password: string;
 };

@@ -34,6 +34,19 @@ model Hairdresser {
   updatedAt       DateTime  @updatedAt
 }
 
+model RegistrationVerification {
+  id           String    @id @default(cuid())
+  name         String
+  email        String
+  passwordHash String
+  tokenHash    String    @unique
+  expiresAt    DateTime
+  verifiedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([email])
+}
+
 model Service {
   id              String    @id @default(cuid())
   name            String

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { RegistrationService } from "@geocutters/shared";
 import { Button } from "@/components/ui/button";
 import { StepOne } from "@/components/features/register/StepOne";
@@ -13,6 +13,11 @@ const STEPS = ["Your info", "Service area", "Services", "Details"];
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [verificationToken, setVerificationToken] = useState("");
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [verificationError, setVerificationError] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   // Step 1: Personal info
   const [name, setName] = useState("");
@@ -38,12 +43,56 @@ export default function RegisterPage() {
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
 
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get(
+      "verificationToken",
+    );
+    if (!token) return;
+
+    setVerificationLoading(true);
+    fetch(`/api/register/verify?token=${encodeURIComponent(token)}`)
+      .then(async (response) => {
+        if (!response.ok) {
+          const body = await response.json();
+          throw new Error(body.error ?? "Unable to verify email");
+        }
+        setVerificationToken(token);
+        setVerificationSent(false);
+        setStep(2);
+      })
+      .catch((error: Error) => setVerificationError(error.message))
+      .finally(() => setVerificationLoading(false));
+  }, []);
+
+  const handleRequestVerification = async () => {
+    setVerificationError("");
+    setVerificationSent(false);
+    setVerificationLoading(true);
+
+    try {
+      const response = await fetch("/api/register/verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const body = await response.json();
+      if (!response.ok) {
+        setVerificationError(body.error ?? "Unable to send verification email");
+        return;
+      }
+
+      setVerificationSent(true);
+    } catch {
+      setVerificationError("Unable to send verification email");
+    } finally {
+      setVerificationLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     // Collect all form data
     const formData = {
-      name,
-      email,
-      password,
       phone: null,
       lat,
       lng,
@@ -52,23 +101,27 @@ export default function RegisterPage() {
       bio,
       experience,
       dbs,
+      verificationToken,
     };
 
-    console.log("Submitting:", formData);
-
-    // Send to your API
     try {
+      setSubmitError("");
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
+      const body = await response.json();
       if (response.ok) {
+        window.localStorage.setItem("authToken", body.token);
         setSubmitted(true);
+      } else {
+        setSubmitError(body.error ?? "Unable to complete registration");
       }
     } catch (error) {
       console.error("Failed to submit:", error);
+      setSubmitError("Unable to complete registration");
     }
   };
 
@@ -144,7 +197,23 @@ export default function RegisterPage() {
       {/* Form Card */}
       <div className="bg-card border border-border rounded-xl p-6">
         {/* Step 1 */}
-        {step === 1 && (
+        {step === 1 && verificationLoading && (
+          <p className="text-sm text-muted-foreground text-center">
+            Verifying your email...
+          </p>
+        )}
+        {step === 1 && !verificationLoading && verificationSent && (
+          <div className="text-center space-y-3">
+            <h2 className="text-xl font-bold text-foreground">
+              Check your email
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              We sent a verification link to {email}. Open it to continue your
+              registration.
+            </p>
+          </div>
+        )}
+        {step === 1 && !verificationLoading && !verificationSent && (
           <div>
             <h2 className="text-xl font-bold text-foreground mb-1">
               Your details
@@ -161,7 +230,9 @@ export default function RegisterPage() {
               setPassword={setPassword}
               confirmPassword={confirmPassword}
               setConfirmPassword={setConfirmPassword}
-              onNext={handleNext}
+              onNext={handleRequestVerification}
+              isSubmitting={verificationLoading}
+              error={verificationError}
             />
           </div>
         )}
@@ -227,6 +298,11 @@ export default function RegisterPage() {
               onSubmit={handleSubmit}
               onBack={handleBack}
             />
+            {submitError && (
+              <p className="mt-4 text-sm text-destructive" role="alert">
+                {submitError}
+              </p>
+            )}
           </div>
         )}
       </div>

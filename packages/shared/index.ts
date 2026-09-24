@@ -15,4 +15,9 @@ export interface Service {
   price: number;
 }
 
-export type { RegisterRequest, RegistrationService } from "./types/registration";
+export type {
+  RegisterRequest,
+  CompleteRegistrationRequest,
+  RegistrationService,
+  RequestVerification,
+} from "./types/registration";

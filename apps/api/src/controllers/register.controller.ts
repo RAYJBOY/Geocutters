@@ -1,15 +1,21 @@
 import type { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { Prisma } from "../../generated/prisma/client.js";
 import {
   registerHairdresser,
-  RegistrationValidationError,
   type RegisterPayload,
 } from "../services/register.service";
+import { RegistrationValidationError } from "../services/registration.errors";
 
 export async function registerController(req: Request, res: Response) {
   try {
     const hairdresser = await registerHairdresser(req.body as RegisterPayload);
-    res.status(201).json({ hairdresser });
+    const token = jwt.sign(
+      { sub: hairdresser.id, email: hairdresser.email },
+      process.env.JWT_SECRET ?? "development-only-secret",
+      { expiresIn: "7d" },
+    );
+    res.status(201).json({ hairdresser, token });
   } catch (error) {
     if (error instanceof RegistrationValidationError) {
       res.status(400).json({ error: error.message });

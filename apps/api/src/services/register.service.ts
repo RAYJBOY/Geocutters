@@ -1,7 +1,9 @@
 import { prisma } from "../../lib/prisma.js";
-import type { RegisterRequest } from "@geocutters/shared";
+import type { CompleteRegistrationRequest } from "@geocutters/shared";
+import { getVerifiedRegistration } from "./verification.service";
+import { RegistrationValidationError } from "./registration.errors";
 
-export type RegisterPayload = RegisterRequest;
+export type RegisterPayload = CompleteRegistrationRequest;
 
 type NormalizedService = {
   name: string;
@@ -22,8 +24,6 @@ type NormalizedRegistration = {
   yearsOfExperience?: number;
   dbsVerified: boolean;
 };
-
-export class RegistrationValidationError extends Error {}
 
 function requiredString(value: unknown, field: string): string {
   if (typeof value !== "string" || value.trim() === "") {
@@ -67,7 +67,9 @@ function normalizeExperience(value: unknown): number | undefined {
   );
 }
 
-function normalizePayload(payload: RegisterPayload): NormalizedRegistration {
+function normalizePayload(
+  payload: RegisterPayload & { name: string; email: string; password: string },
+): NormalizedRegistration {
   const email = requiredString(payload.email, "email").toLowerCase();
   if (!email.includes("@")) {
     throw new RegistrationValidationError("email is invalid");
@@ -117,15 +119,31 @@ function normalizePayload(payload: RegisterPayload): NormalizedRegistration {
 }
 
 export async function registerHairdresser(payload: RegisterPayload) {
-  const registration = normalizePayload(payload);
+  const verification = await getVerifiedRegistration(
+    payload.verificationToken,
+  );
+  const registration = normalizePayload({
+    ...payload,
+    name: verification.name,
+    email: verification.email,
+    password: verification.passwordHash,
+  });
 
-  return prisma.hairdresser.create({
-    data: {
-      ...registration,
-      services: {
-        create: registration.services,
+  return prisma.$transaction(async (transaction) => {
+    const hairdresser = await transaction.hairdresser.create({
+      data: {
+        ...registration,
+        services: {
+          create: registration.services,
+        },
       },
-    },
-    include: { services: true },
+      include: { services: true },
+    });
+
+    await transaction.registrationVerification.delete({
+      where: { id: verification.id },
+    });
+
+    return hairdresser;
   });
 }

@@ -12,7 +12,9 @@ type StepOneProps = {
   setPassword: (value: string) => void;
   confirmPassword: string;
   setConfirmPassword: (value: string) => void;
-  onNext: () => void;
+  onNext: () => void | Promise<void>;
+  isSubmitting: boolean;
+  error: string;
 };
 
 export const StepOne = ({
@@ -25,10 +27,12 @@ export const StepOne = ({
   confirmPassword,
   setConfirmPassword,
   onNext,
+  isSubmitting,
+  error,
 }: StepOneProps) => {
   const [passwordError, setPasswordError] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -37,7 +41,7 @@ export const StepOne = ({
     }
 
     setPasswordError("");
-    onNext();
+    await onNext();
   };
 
   return (
@@ -105,10 +109,11 @@ export const StepOne = ({
         </Field>
 
         <div className="flex gap-3 mt-8 pt-6 border-t border-border">
-          <Button type="submit" className="flex-1">
-            Continue
+          <Button type="submit" className="flex-1" disabled={isSubmitting}>
+            {isSubmitting ? "Sending verification email..." : "Continue"}
           </Button>
         </div>
+        {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
       </FieldGroup>
     </form>
   );
