@@ -4,10 +4,10 @@ import { Prisma } from "../../generated/prisma/client.js";
 import {
   registerHairdresser,
   type RegisterPayload,
-} from "../services/register.service";
+} from "../services/registerAsHairdresser.service";
 import { RegistrationValidationError } from "../services/registration.errors";
 
-export async function registerController(req: Request, res: Response) {
+export async function hairdresserRegisterController(req: Request, res: Response) {
   try {
     const hairdresser = await registerHairdresser(req.body as RegisterPayload);
     const token = jwt.sign(

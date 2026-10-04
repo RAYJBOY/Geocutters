@@ -5,7 +5,6 @@ export const RegisterAsAHairdresser = () => {
   return (
     <section className="py-12 px-4 bg-background">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center">
-        {/* Left content */}
         <div className="flex-1">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Take your business
@@ -19,8 +18,8 @@ export const RegisterAsAHairdresser = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/register">
-              <Button className="bg-foreground hover:bg-background hover:text-foreground w-full sm:w-auto">
+            <Link href="/joinAsHairdresser">
+              <Button className="bg-foreground hover:bg-background hover:text-foreground w-full sm:w-auto p-4">
                 Register as a hairdresser
               </Button>
             </Link>

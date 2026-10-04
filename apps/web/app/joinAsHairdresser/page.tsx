@@ -50,7 +50,7 @@ export default function RegisterPage() {
     if (!token) return;
 
     setVerificationLoading(true);
-    fetch(`/api/register/verify?token=${encodeURIComponent(token)}`)
+    fetch(`/api/registerAsHairdresser/verify?token=${encodeURIComponent(token)}`)
       .then(async (response) => {
         if (!response.ok) {
           const body = await response.json();
@@ -70,7 +70,7 @@ export default function RegisterPage() {
     setVerificationLoading(true);
 
     try {
-      const response = await fetch("/api/register/verification", {
+      const response = await fetch("/api/registerAsHairdresser/verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -106,7 +106,7 @@ export default function RegisterPage() {
 
     try {
       setSubmitError("");
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/registerAsHairdresser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

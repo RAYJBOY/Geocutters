@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerController } from "../controllers/register.controller.js";
+import { hairdresserRegisterController } from "../controllers/registerAsHairdresser.controller";
 import {
 	requestVerificationController,
 	verifyController,
@@ -7,8 +7,8 @@ import {
 
 const registerRoute = Router();
 
-registerRoute.post("/register", registerController);
-registerRoute.post("/register/verification", requestVerificationController);
-registerRoute.get("/register/verify", verifyController);
+registerRoute.post("/registerAsHairdresser", hairdresserRegisterController);
+registerRoute.post("/registerAsHairdresser/verification", requestVerificationController);
+registerRoute.get("/registerAsHairdresser/verify", verifyController);
 
 export { registerRoute };

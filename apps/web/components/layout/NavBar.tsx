@@ -8,6 +8,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { NavBarLink } from "@/types/navbar";
+import { SignInUp } from "../auth/SignInUp";
 
 interface NavBarProps {
   links: NavBarLink[];
@@ -31,9 +32,15 @@ export const NavBar = ({ links }: NavBarProps) => {
         </NavigationMenu>
       </div>
 
-      <Button className="absolute top-4 right-4 bg-background text-foreground p-4 hover:bg-foreground hover:text-background">
-        <Link href="/register">Register as a hairdresser</Link>
-      </Button>
+      <div className="flex absolute top-4 right-4 gap-3">
+        <Button
+          variant="link"
+          className="h-auto p-0 text-background underline-offset-4 hover:text-background/80 hover:no-underline"
+        >
+          <Link href="/joinAsHairdresser">Register as a hairdresser</Link>
+        </Button>
+        <SignInUp/>
+      </div>
     </div>
   );
 };
