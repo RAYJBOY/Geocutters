@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import { User } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
@@ -6,8 +8,10 @@ import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
 
 export const SignInUp = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger
         render={
           <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/80" />
@@ -26,7 +30,7 @@ export const SignInUp = () => {
             <SignUpForm />
           </TabsContent>
           <TabsContent value="signIn">
-            <SignInForm />
+            <SignInForm onSignedIn={() => setIsOpen(false)} />
           </TabsContent>
         </Tabs>
       </DialogContent>

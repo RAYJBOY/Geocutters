@@ -4,8 +4,13 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useState } from "react";
 
-export const SignInForm = () => {
+type SignInFormProps = {
+  onSignedIn: () => void;
+};
+
+export const SignInForm = ({ onSignedIn }: SignInFormProps) => {
   const [error, setError] = useState("");
+  const supabase = getSupabaseBrowserClient();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -16,7 +21,6 @@ export const SignInForm = () => {
 
       const email = String(formData.get("email") ?? "").trim();
       const password = String(formData.get("password") ?? "");
-      const supabase = getSupabaseBrowserClient();
 
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -24,8 +28,11 @@ export const SignInForm = () => {
       });
 
       if (error) {
-        setError("Error signing up.");
+        setError("Unable to sign in. Check your email and password.");
+        return;
       }
+
+      onSignedIn();
     } catch (error) {
       console.log("ERROR: ", error);
     }

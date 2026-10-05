@@ -9,12 +9,23 @@ import {
 } from "@/components/ui/navigation-menu";
 import { NavBarLink } from "@/types/navbar";
 import { SignInUp } from "../auth/SignInUp";
+import { LoggedInUser } from "../auth/LoggedInUser";
+import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 
 interface NavBarProps {
   links: NavBarLink[];
 }
 
-export const NavBar = ({ links }: NavBarProps) => {
+export const NavBar = async ({ links }: NavBarProps) => {
+  const supabase = await createSupabaseServerClient();
+
+  const loggedInUser = (await supabase.auth.getUser()).data.user;
+  const name = loggedInUser?.user_metadata?.name;
+  const displayName =
+    typeof name === "string" && name.trim()
+      ? name.trim()
+      : (loggedInUser?.email ?? "Account");
+
   return (
     <div className="relative bg-foreground p-4">
       <div className="max-w-6xl mx-auto flex justify-center">
@@ -39,7 +50,8 @@ export const NavBar = ({ links }: NavBarProps) => {
         >
           <Link href="/joinAsHairdresser">Register as a hairdresser</Link>
         </Button>
-        <SignInUp/>
+        {!loggedInUser && <SignInUp />}
+        {loggedInUser && <LoggedInUser name={displayName} />}
       </div>
     </div>
   );
