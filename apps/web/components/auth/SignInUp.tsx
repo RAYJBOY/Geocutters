@@ -1,12 +1,5 @@
-import { User, Link } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
+import { User } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { SignInForm } from "./SignInForm";
@@ -15,23 +8,25 @@ import { SignUpForm } from "./SignUpForm";
 export const SignInUp = () => {
   return (
     <Dialog>
-      <DialogTrigger render={<span />}>
-        <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/80">
-          <User />
-          Sign In/Up
-        </Button>
+      <DialogTrigger
+        render={
+          <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/80" />
+        }
+      >
+        <User />
+        Sign In/Up
       </DialogTrigger>
       <DialogContent>
-        <Tabs defaultValue="account" >
+        <Tabs defaultValue="signUp">
           <TabsList>
-            <TabsTrigger value="signIn">Sign In</TabsTrigger>
             <TabsTrigger value="signUp">Sign Up</TabsTrigger>
+            <TabsTrigger value="signIn">Sign In</TabsTrigger>
           </TabsList>
-          <TabsContent value="signIn">
-            <SignInForm />
-          </TabsContent>
           <TabsContent value="signUp">
             <SignUpForm />
+          </TabsContent>
+          <TabsContent value="signIn">
+            <SignInForm />
           </TabsContent>
         </Tabs>
       </DialogContent>
