@@ -11,16 +11,13 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@geocutters/shared": "1.0.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
-    "@geocutters/shared": "1.0.0",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/express": "^5.0.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.2",
     "pg": "^8.23.0",
-    "resend": "^6.5.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },

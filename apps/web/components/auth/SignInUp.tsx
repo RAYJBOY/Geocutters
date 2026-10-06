@@ -7,7 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
 
-export const SignInUp = () => {
+type SignInUpProps = {
+  redirectTo?: string;
+};
+
+export const SignInUp = ({ redirectTo }: SignInUpProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -27,7 +31,7 @@ export const SignInUp = () => {
             <TabsTrigger value="signIn">Sign In</TabsTrigger>
           </TabsList>
           <TabsContent value="signUp">
-            <SignUpForm />
+            <SignUpForm redirectTo={redirectTo} />
           </TabsContent>
           <TabsContent value="signIn">
             <SignInForm onSignedIn={() => setIsOpen(false)} />

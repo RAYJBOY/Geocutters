@@ -16,8 +16,6 @@ export interface Service {
 }
 
 export type {
-  RegisterRequest,
   CompleteRegistrationRequest,
   RegistrationService,
-  RequestVerification,
 } from "./types/registration";

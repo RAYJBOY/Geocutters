@@ -1,6 +1,5 @@
 import { prisma } from "../../lib/prisma.js";
 import type { CompleteRegistrationRequest } from "@geocutters/shared";
-import { getVerifiedRegistration } from "./verification.service";
 import { RegistrationValidationError } from "./registration.errors";
 
 export type RegisterPayload = CompleteRegistrationRequest;
@@ -14,7 +13,7 @@ type NormalizedService = {
 type NormalizedRegistration = {
   name: string;
   email: string;
-  password: string;
+  supabaseUserId: string;
   phone?: string;
   serviceCenterLat: number;
   serviceCenterLng: number;
@@ -34,6 +33,10 @@ function requiredString(value: unknown, field: string): string {
 }
 
 function finiteNumber(value: unknown, field: string): number {
+  if (value === null || value === undefined || value === "") {
+    throw new RegistrationValidationError(`${field} must be a number`);
+  }
+
   const number = typeof value === "number" ? value : Number(value);
 
   if (!Number.isFinite(number)) {
@@ -68,13 +71,8 @@ function normalizeExperience(value: unknown): number | undefined {
 }
 
 function normalizePayload(
-  payload: RegisterPayload & { name: string; email: string; password: string },
+  payload: RegisterPayload & { email: string; supabaseUserId: string },
 ): NormalizedRegistration {
-  const email = requiredString(payload.email, "email").toLowerCase();
-  if (!email.includes("@")) {
-    throw new RegistrationValidationError("email is invalid");
-  }
-
   if (!Array.isArray(payload.services) || payload.services.length === 0) {
     throw new RegistrationValidationError("at least one service is required");
   }
@@ -95,9 +93,10 @@ function normalizePayload(
     };
   });
 
-  const bio = payload.bio === undefined || payload.bio === null
-    ? undefined
-    : requiredString(payload.bio, "bio");
+  const bio =
+    typeof payload.bio === "string" && payload.bio.trim() !== ""
+      ? payload.bio.trim()
+      : undefined;
   const phone = payload.phone === null || payload.phone === undefined || payload.phone === ""
     ? undefined
     : requiredString(payload.phone, "phone");
@@ -105,8 +104,8 @@ function normalizePayload(
 
   return {
     name: requiredString(payload.name, "name"),
-    email,
-    password: requiredString(payload.password, "password"),
+    email: payload.email,
+    supabaseUserId: payload.supabaseUserId,
     serviceCenterLat: finiteNumber(payload.lat, "lat"),
     serviceCenterLng: finiteNumber(payload.lng, "lng"),
     serviceRadiusM: positiveInteger(payload.radius, "radius"),
@@ -118,32 +117,23 @@ function normalizePayload(
   };
 }
 
-export async function registerHairdresser(payload: RegisterPayload) {
-  const verification = await getVerifiedRegistration(
-    payload.verificationToken,
-  );
+export async function registerHairdresser(
+  payload: RegisterPayload,
+  user: { id: string; email: string },
+) {
   const registration = normalizePayload({
     ...payload,
-    name: verification.name,
-    email: verification.email,
-    password: verification.passwordHash,
+    email: requiredString(user.email, "account email").toLowerCase(),
+    supabaseUserId: requiredString(user.id, "account id"),
   });
 
-  return prisma.$transaction(async (transaction) => {
-    const hairdresser = await transaction.hairdresser.create({
-      data: {
-        ...registration,
-        services: {
-          create: registration.services,
-        },
+  return prisma.hairdresser.create({
+    data: {
+      ...registration,
+      services: {
+        create: registration.services,
       },
-      include: { services: true },
-    });
-
-    await transaction.registrationVerification.delete({
-      where: { id: verification.id },
-    });
-
-    return hairdresser;
+    },
+    include: { services: true },
   });
 }

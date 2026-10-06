@@ -1,145 +1,165 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { RegistrationService } from "@geocutters/shared";
-import { Button } from "@/components/ui/button";
+import { SignInUp } from "@/components/auth/SignInUp";
 import { StepOne } from "@/components/features/register/StepOne";
 import { StepTwo } from "@/components/features/register/StepTwo";
 import StepThree from "@/components/features/register/StepThree";
 import StepFour from "@/components/features/register/StepFour";
+import { Button } from "@/components/ui/button";
+import { useHairdresserAccount } from "@/hooks/useHairdresserAccount";
 
-const STEPS = ["Your info", "Service area", "Services", "Details"];
+const STEPS = ["Account", "Service area", "Services", "Details"];
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const accountIdRef = useRef<string | null>(null);
+  const { status: accountStatus, accessToken, user } = useHairdresserAccount();
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
-  const [verificationToken, setVerificationToken] = useState("");
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [verificationLoading, setVerificationLoading] = useState(false);
-  const [verificationError, setVerificationError] = useState("");
   const [submitError, setSubmitError] = useState("");
+  const [submitLoading, setSubmitLoading] = useState(false);
 
-  // Step 1: Personal info
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  // Step 2: Service area
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [radius, setRadius] = useState(5000);
-
-  // Step 3: Services
   const [services, setServices] = useState<RegistrationService[]>([
     { name: "", price: "", duration: "" },
   ]);
-
-  // Step 4: Details
   const [bio, setBio] = useState("");
   const [experience, setExperience] = useState<number | null>(null);
   const [dbs, setDbs] = useState(false);
 
-  const handleNext = () => setStep(step + 1);
-  const handleBack = () => setStep(step - 1);
-
   useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get(
-      "verificationToken",
+    if (accountIdRef.current === user?.id) return;
+
+    accountIdRef.current = user?.id ?? null;
+    setStep(1);
+    setName(
+      typeof user?.user_metadata?.name === "string"
+        ? user.user_metadata.name.trim()
+        : "",
     );
-    if (!token) return;
+    setLat(null);
+    setLng(null);
+    setRadius(5000);
+    setServices([{ name: "", price: "", duration: "" }]);
+    setBio("");
+    setExperience(null);
+    setDbs(false);
+    setSubmitError("");
+  }, [user]);
 
-    setVerificationLoading(true);
-    fetch(`/api/registerAsHairdresser/verify?token=${encodeURIComponent(token)}`)
-      .then(async (response) => {
-        if (!response.ok) {
-          const body = await response.json();
-          throw new Error(body.error ?? "Unable to verify email");
-        }
-        setVerificationToken(token);
-        setVerificationSent(false);
-        setStep(2);
-      })
-      .catch((error: Error) => setVerificationError(error.message))
-      .finally(() => setVerificationLoading(false));
-  }, []);
+  const handleNext = () => setStep((currentStep) => currentStep + 1);
+  const handleBack = () => setStep((currentStep) => currentStep - 1);
 
-  const handleRequestVerification = async () => {
-    setVerificationError("");
-    setVerificationSent(false);
-    setVerificationLoading(true);
+  const handleSubmit = async () => {
+    if (!accessToken || !user) {
+      setSubmitError("Please sign in again before submitting your profile.");
+      return;
+    }
 
+    setSubmitError("");
+    setSubmitLoading(true);
     try {
-      const response = await fetch("/api/registerAsHairdresser/verification", {
+      const response = await fetch("/api/registerAsHairdresser", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          name,
+          phone: null,
+          lat,
+          lng,
+          radius,
+          services,
+          bio,
+          experience,
+          dbs,
+        }),
       });
 
       const body = await response.json();
       if (!response.ok) {
-        setVerificationError(body.error ?? "Unable to send verification email");
+        setSubmitError(body.error ?? "Unable to complete registration");
         return;
       }
-
-      setVerificationSent(true);
-    } catch {
-      setVerificationError("Unable to send verification email");
-    } finally {
-      setVerificationLoading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    // Collect all form data
-    const formData = {
-      phone: null,
-      lat,
-      lng,
-      radius,
-      services,
-      bio,
-      experience,
-      dbs,
-      verificationToken,
-    };
-
-    try {
-      setSubmitError("");
-      const response = await fetch("/api/registerAsHairdresser", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const body = await response.json();
-      if (response.ok) {
-        window.localStorage.setItem("authToken", body.token);
-        setSubmitted(true);
-      } else {
-        setSubmitError(body.error ?? "Unable to complete registration");
-      }
+      setSubmitted(true);
     } catch (error) {
-      console.error("Failed to submit:", error);
+      console.error("Failed to submit hairdresser profile:", error);
       setSubmitError("Unable to complete registration");
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
   const addService = () =>
-    setServices((prev) => [...prev, { name: "", price: "", duration: "" }]);
+    setServices((previous) => [
+      ...previous,
+      { name: "", price: "", duration: "" },
+    ]);
 
-  const removeService = (i: number) =>
-    setServices((prev) => prev.filter((_, idx) => idx !== i));
+  const removeService = (index: number) =>
+    setServices((previous) =>
+      previous.filter((_, itemIndex) => itemIndex !== index),
+    );
 
   const updateService = (
-    i: number,
+    index: number,
     field: keyof RegistrationService,
-    val: string,
+    value: string,
   ) => {
-    setServices((prev) =>
-      prev.map((s, idx) => (idx === i ? { ...s, [field]: val } : s)),
+    setServices((previous) =>
+      previous.map((service, itemIndex) =>
+        itemIndex === index ? { ...service, [field]: value } : service,
+      ),
     );
   };
+
+  if (accountStatus === "checking") {
+    return (
+      <div className="mx-auto flex min-h-64 max-w-lg items-center justify-center px-4">
+        <p className="text-sm text-muted-foreground">
+          Checking your account...
+        </p>
+      </div>
+    );
+  }
+
+  if (accountStatus === "error") {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-foreground">
+          We couldn&apos;t verify your account
+        </h1>
+        <p className="mt-3 text-muted-foreground">
+          Please refresh the page or sign in again.
+        </p>
+      </div>
+    );
+  }
+
+  if (accountStatus === "signedOut" || !user) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-foreground">
+          Sign in to register as a hairdresser
+        </h1>
+        <p className="mt-3 text-muted-foreground">
+          Use your existing Geocutters account, or create one, to set up your
+          hairdresser profile.
+        </p>
+        <div className="mt-6 flex justify-center">
+          <SignInUp redirectTo="/joinAsHairdresser" />
+        </div>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
@@ -149,9 +169,11 @@ export default function RegisterPage() {
             Application submitted!
           </h2>
           <p className="text-muted-foreground mb-6">
-            We'll review your profile and email you within 48 hours.
+            We&apos;ll review your profile and email you within 48 hours.
           </p>
-          <Button className="w-full">Go to Dashboard</Button>
+          <Button className="w-full" onClick={() => router.push("/")}>
+            Return home
+          </Button>
         </div>
       </div>
     );
@@ -159,28 +181,25 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-lg mx-auto py-12">
-      {/* Stepper */}
       <div className="mb-8">
         <div className="flex items-center justify-center gap-2 mb-4">
-          {STEPS.map((_, i) => {
-            const n = i + 1;
-            const done = step > n;
-            const active = step === n;
+          {STEPS.map((_, index) => {
+            const number = index + 1;
+            const done = step > number;
+            const active = step === number;
 
             return (
-              <div key={n} className="flex items-center gap-2">
+              <div key={number} className="flex items-center gap-2">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                    done
+                    done || active
                       ? "bg-primary text-primary-foreground"
-                      : active
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
+                      : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {done ? "✓" : n}
+                  {done ? "✓" : number}
                 </div>
-                {n < STEPS.length && (
+                {number < STEPS.length && (
                   <div
                     className={`w-8 h-0.5 ${done ? "bg-primary" : "bg-border"}`}
                   />
@@ -194,50 +213,25 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Form Card */}
       <div className="bg-card border border-border rounded-xl p-6">
-        {/* Step 1 */}
-        {step === 1 && verificationLoading && (
-          <p className="text-sm text-muted-foreground text-center">
-            Verifying your email...
-          </p>
-        )}
-        {step === 1 && !verificationLoading && verificationSent && (
-          <div className="text-center space-y-3">
-            <h2 className="text-xl font-bold text-foreground">
-              Check your email
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              We sent a verification link to {email}. Open it to continue your
-              registration.
-            </p>
-          </div>
-        )}
-        {step === 1 && !verificationLoading && !verificationSent && (
+        {step === 1 && (
           <div>
             <h2 className="text-xl font-bold text-foreground mb-1">
-              Your details
+              Your account
             </h2>
             <p className="text-muted-foreground text-sm mb-6">
-              Let's start with some basic information.
+              This profile will be connected to your signed-in Geocutters
+              account.
             </p>
             <StepOne
               name={name}
               setName={setName}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              confirmPassword={confirmPassword}
-              setConfirmPassword={setConfirmPassword}
-              onNext={handleRequestVerification}
-              isSubmitting={verificationLoading}
-              error={verificationError}
+              email={user.email ?? ""}
+              onNext={handleNext}
             />
           </div>
         )}
 
-        {/* Step 2 */}
         {step === 2 && (
           <div>
             <h2 className="text-xl font-bold text-foreground mb-1">
@@ -259,7 +253,6 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* Step 3 */}
         {step === 3 && (
           <div>
             <h2 className="text-xl font-bold text-foreground mb-1">
@@ -279,7 +272,6 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* Step 4 */}
         {step === 4 && (
           <div>
             <h2 className="text-xl font-bold text-foreground mb-1">
@@ -295,9 +287,16 @@ export default function RegisterPage() {
               setExperience={setExperience}
               dbs={dbs}
               setDbs={setDbs}
-              onSubmit={handleSubmit}
+              onSubmit={() => {
+                if (!submitLoading) void handleSubmit();
+              }}
               onBack={handleBack}
             />
+            {submitLoading && (
+              <p className="mt-4 text-sm text-muted-foreground" role="status">
+                Submitting your profile...
+              </p>
+            )}
             {submitError && (
               <p className="mt-4 text-sm text-destructive" role="alert">
                 {submitError}

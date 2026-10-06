@@ -1,21 +1,40 @@
 import type { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { Prisma } from "../../generated/prisma/client.js";
 import {
   registerHairdresser,
   type RegisterPayload,
 } from "../services/registerAsHairdresser.service";
 import { RegistrationValidationError } from "../services/registration.errors";
+import { getSupabaseUser } from "../services/supabase-auth.service";
 
 export async function hairdresserRegisterController(req: Request, res: Response) {
   try {
-    const hairdresser = await registerHairdresser(req.body as RegisterPayload);
-    const token = jwt.sign(
-      { sub: hairdresser.id, email: hairdresser.email },
-      process.env.JWT_SECRET ?? "development-only-secret",
-      { expiresIn: "7d" },
+    const authorization = req.get("authorization");
+    const accessToken = authorization?.match(/^Bearer\s+(.+)$/i)?.[1];
+    if (!accessToken) {
+      res.status(401).json({ error: "Sign in to register as a hairdresser" });
+      return;
+    }
+
+    const user = await getSupabaseUser(accessToken);
+    if (!user) {
+      res.status(401).json({ error: "Your session is invalid or expired" });
+      return;
+    }
+
+    if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+      res.status(400).json({ error: "A hairdresser profile is required" });
+      return;
+    }
+
+    const hairdresser = await registerHairdresser(
+      req.body as RegisterPayload,
+      user,
     );
-    res.status(201).json({ hairdresser, token });
+    res.status(201).json({
+      message: "Hairdresser profile submitted",
+      hairdresserId: hairdresser.id,
+    });
   } catch (error) {
     if (error instanceof RegistrationValidationError) {
       res.status(400).json({ error: error.message });
@@ -26,7 +45,9 @@ export async function hairdresserRegisterController(req: Request, res: Response)
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      res.status(409).json({ error: "A hairdresser with this email already exists" });
+      res.status(409).json({
+        error: "A hairdresser profile already exists for this account or email",
+      });
       return;
     }
 

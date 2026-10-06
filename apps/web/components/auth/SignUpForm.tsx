@@ -5,7 +5,11 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { MailCheck, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
-export const SignUpForm = () => {
+type SignUpFormProps = {
+  redirectTo?: string;
+};
+
+export const SignUpForm = ({ redirectTo }: SignUpFormProps) => {
   const [error, setError] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
@@ -37,6 +41,9 @@ export const SignUpForm = () => {
           data: {
             name,
           },
+          ...(redirectTo
+            ? { emailRedirectTo: `${window.location.origin}${redirectTo}` }
+            : {}),
         },
       });
 
