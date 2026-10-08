@@ -1,9 +1,11 @@
 import express from "express";
-import { registerRoute } from "./routes/auth.route";
+import { authRoute } from "./routes/auth.route";
+import { hairdresserRoute } from "./routes/hairdresser.route";
 
 const app = express();
 app.use(express.json());
-app.use("/api", registerRoute);
+app.use("/api/auth", authRoute);
+app.use("/api/hairdresser", hairdresserRoute);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

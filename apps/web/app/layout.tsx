@@ -21,7 +21,7 @@ const NavBarLinks: NavBarLink[] = [
   },
   {
     name: "Find Hairdresser",
-    link: "/find-hairdresser",
+    link: "/findHairdresser",
   },
   {
     name: "Contact Us",

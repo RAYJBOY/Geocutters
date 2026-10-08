@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { hairdresserRegisterController } from "../controllers/registerAsHairdresser.controller.js";
 
-const registerRoute = Router();
+const authRoute = Router();
 
-registerRoute.post("/registerAsHairdresser", hairdresserRegisterController);
+authRoute.post("/registerAsHairdresser", hairdresserRegisterController);
 
-export { registerRoute };
+export { authRoute };

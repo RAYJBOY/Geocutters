@@ -65,7 +65,7 @@ export default function RegisterPage() {
     setSubmitError("");
     setSubmitLoading(true);
     try {
-      const response = await fetch("/api/registerAsHairdresser", {
+      const response = await fetch("/api/auth/registerAsHairdresser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
