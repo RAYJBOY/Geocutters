@@ -23,6 +23,10 @@ export const LoggedInUser = ({ name }: LoggedInUserProps) => {
     if (!error) router.refresh();
   };
 
+  const goToProfile = () => {
+    router.push("/profile");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -37,7 +41,12 @@ export const LoggedInUser = ({ name }: LoggedInUserProps) => {
         <span className="max-w-40 truncate">{name}</span>
         <ChevronDown aria-hidden="true" className="size-3" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-fit min-w-0">
+      <DropdownMenuContent>
+        <DropdownMenuItem onClick={goToProfile}>
+          <UserRound aria-hidden="true" />
+          My profile
+        </DropdownMenuItem>
+
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut aria-hidden="true" />
           Log out

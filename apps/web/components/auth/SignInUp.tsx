@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
@@ -13,6 +14,7 @@ type SignInUpProps = {
 
 export const SignInUp = ({ redirectTo }: SignInUpProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -34,7 +36,12 @@ export const SignInUp = ({ redirectTo }: SignInUpProps) => {
             <SignUpForm redirectTo={redirectTo} />
           </TabsContent>
           <TabsContent value="signIn">
-            <SignInForm onSignedIn={() => setIsOpen(false)} />
+            <SignInForm
+              onSignedIn={() => {
+                setIsOpen(false);
+                router.refresh();
+              }}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>
