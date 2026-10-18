@@ -3,6 +3,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
+import type {
+  HairdresserProfileForm,
+  HairdresserProfileResponse,
+  HairdresserProfileUpdateRequest,
+} from "@geocutters/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,47 +16,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useHairdresserAccount } from "@/hooks/useHairdresserAccount";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 
-type Service = {
-  id?: string;
-  name: string;
-  price: string;
-  durationMinutes: string;
-};
-
-type HairdresserProfile = {
-  name: string;
-  email: string;
-  phone: string;
-  bio: string;
-  yearsOfExperience: string;
-  serviceCenterLat: string;
-  serviceCenterLng: string;
-  serviceRadiusM: string;
-  services: Service[];
-};
-
-type HairdresserResponse = {
-  hairdresser?: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string | null;
-    bio: string | null;
-    yearsOfExperience: number | null;
-    serviceCenterLat: number;
-    serviceCenterLng: number;
-    serviceRadiusM: number;
-    services: {
-      id: string;
-      name: string;
-      price: number;
-      durationMinutes: number;
-    }[];
-  };
-  error?: string;
-};
-
-function toEditableProfile(profile: NonNullable<HairdresserResponse["hairdresser"]>): HairdresserProfile {
+function toEditableProfile(
+  profile: NonNullable<HairdresserProfileResponse["hairdresser"]>,
+): HairdresserProfileForm {
   return {
     name: profile.name,
     email: profile.email,
@@ -105,7 +72,7 @@ function ProfileEditor({ user, accessToken }: { user: User; accessToken: string 
     typeof user.user_metadata.name === "string" ? user.user_metadata.name : "",
   );
   const [email, setEmail] = useState(user.email ?? "");
-  const [profile, setProfile] = useState<HairdresserProfile | null>(null);
+  const [profile, setProfile] = useState<HairdresserProfileForm | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState("");
   const [message, setMessage] = useState("");
@@ -120,7 +87,7 @@ function ProfileEditor({ user, accessToken }: { user: User; accessToken: string 
     })
       .then(async (response) => {
         if (response.status === 404) return null;
-        const body: HairdresserResponse = await response.json();
+        const body: HairdresserProfileResponse = await response.json();
         if (!response.ok || !body.hairdresser) {
           throw new Error(body.error ?? "Unable to load your hairdresser profile");
         }
@@ -193,7 +160,7 @@ function ProfileEditor({ user, accessToken }: { user: User; accessToken: string 
         },
         body: JSON.stringify(profileToRequest(profile)),
       });
-      const body: HairdresserResponse = await response.json();
+      const body: HairdresserProfileResponse = await response.json();
       if (!response.ok || !body.hairdresser) {
         throw new Error(body.error ?? "Unable to update your hairdresser profile");
       }
@@ -258,7 +225,7 @@ function ProfileEditor({ user, accessToken }: { user: User; accessToken: string 
     }
   };
 
-  const updateProfile = (changes: Partial<HairdresserProfile>) => {
+  const updateProfile = (changes: Partial<HairdresserProfileForm>) => {
     setProfile((current) => (current ? { ...current, ...changes } : current));
   };
 
@@ -459,7 +426,9 @@ function ProfileEditor({ user, accessToken }: { user: User; accessToken: string 
   );
 }
 
-function profileToRequest(profile: HairdresserProfile) {
+function profileToRequest(
+  profile: HairdresserProfileForm,
+): HairdresserProfileUpdateRequest {
   return {
     name: profile.name,
     phone: profile.phone || null,

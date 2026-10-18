@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { HairdresserProfileResponse } from "@geocutters/shared";
 import { getHairdresserByUserId } from "../services/getHairdresserByUserId.service.js";
 import { getSupabaseUser } from "../services/supabase-auth.service.js";
 
@@ -25,7 +26,8 @@ export async function getCurrentHairdresserController(
       return;
     }
 
-    res.json({ hairdresser });
+    const body: HairdresserProfileResponse = { hairdresser };
+    res.json(body);
   } catch (error) {
     console.error("Failed to get current hairdresser profile:", error);
     res.status(500).json({ error: "Unable to get hairdresser profile" });

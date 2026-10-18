@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { HairdresserProfileResponse } from "@geocutters/shared";
 import { Prisma } from "../../generated/prisma/client.js";
 import { RegistrationValidationError } from "../services/registration.errors.js";
 import {
@@ -28,7 +29,8 @@ export async function updateHairdresserProfileController(
       user.email,
       req.body,
     );
-    res.json({ hairdresser });
+    const body: HairdresserProfileResponse = { hairdresser };
+    res.json(body);
   } catch (error) {
     if (error instanceof RegistrationValidationError) {
       res.status(400).json({ error: error.message });

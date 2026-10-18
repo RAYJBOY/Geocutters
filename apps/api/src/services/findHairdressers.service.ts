@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma.js";
+import type { HairdresserSearchResult } from "@geocutters/shared";
 
 type Coordinates = {
   lat: number;
@@ -6,8 +7,7 @@ type Coordinates = {
 };
 
 type HairdresserFilters = {
-  location?: Coordinates;
-  distanceKm?: number;
+  location: Coordinates;
   hasDbsCheck: boolean;
 };
 
@@ -30,82 +30,50 @@ function distanceInMeters(
 
 export async function findHairdressers({
   location,
-  distanceKm,
   hasDbsCheck,
 }: HairdresserFilters) {
-  const distanceM = distanceKm === undefined ? undefined : distanceKm * 1000;
-  const latitudeDelta =
-    location && distanceM !== undefined
-      ? distanceM / 111_320
-      : undefined;
-
   const hairdressers = await prisma.hairdresser.findMany({
     where: {
-      ...({dbsVerified: hasDbsCheck}),
-      ...(location && latitudeDelta !== undefined
-        ? {
-            serviceCenterLat: {
-              gte: Math.max(-90, location.lat - latitudeDelta),
-              lte: Math.min(90, location.lat + latitudeDelta),
-            },
-          }
-        : {}),
+      ...(hasDbsCheck ? { dbsVerified: true } : {}),
     },
     orderBy: { name: "asc" },
     select: {
       id: true,
       name: true,
-      bio: true,
       yearsOfExperience: true,
       dbsVerified: true,
       serviceCenterLat: true,
       serviceCenterLng: true,
       serviceRadiusM: true,
-      services: {
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          durationMinutes: true,
-        },
-        orderBy: { name: "asc" },
-      },
     },
   });
 
-  return hairdressers.flatMap((hairdresser) => {
-    const hairdresserDistanceM = location
-      ? distanceInMeters(location, {
-          lat: hairdresser.serviceCenterLat,
-          lng: hairdresser.serviceCenterLng,
-        })
-      : undefined;
+  const matches: { hairdresser: HairdresserSearchResult; distanceM: number }[] =
+    [];
 
-    if (
-      hairdresserDistanceM !== undefined &&
-      (hairdresserDistanceM > hairdresser.serviceRadiusM ||
-        (distanceM !== undefined && hairdresserDistanceM > distanceM))
-    ) {
-      return [];
+  for (const hairdresser of hairdressers) {
+    const distanceM = distanceInMeters(location, {
+      lat: hairdresser.serviceCenterLat,
+      lng: hairdresser.serviceCenterLng,
+    });
+
+    if (distanceM > hairdresser.serviceRadiusM) {
+      continue;
     }
 
-    return [
-      {
+    matches.push({
+      distanceM,
+      hairdresser: {
         id: hairdresser.id,
         name: hairdresser.name,
-        mapLat: Math.round(hairdresser.serviceCenterLat * 100) / 100,
-        mapLng: Math.round(hairdresser.serviceCenterLng * 100) / 100,
-        bio: hairdresser.bio,
         yearsOfExperience: hairdresser.yearsOfExperience,
         dbsVerified: hairdresser.dbsVerified,
-        services: hairdresser.services,
-        ...(hairdresserDistanceM === undefined
-          ? {}
-          : {
-              distanceKm:
-                Math.round((hairdresserDistanceM / 1000) * 10) / 10,
-            }),
+        distanceKm: Math.round((distanceM / 1000) * 10) / 10,
       },
-    ];
-  });
+    });
+  }
+
+  return matches
+    .sort((a, b) => a.distanceM - b.distanceM)
+    .map(({ hairdresser }) => hairdresser);
 }

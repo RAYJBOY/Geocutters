@@ -1,22 +1,10 @@
 import { prisma } from "../../lib/prisma.js";
+import type { HairdresserProfileUpdateRequest } from "@geocutters/shared";
 import { RegistrationValidationError } from "./registration.errors.js";
 
-type HairdresserProfileInput = {
-  name: string;
-  phone: string | null;
-  bio: string | null;
-  yearsOfExperience: number | null;
-  serviceCenterLat: number;
-  serviceCenterLng: number;
-  serviceRadiusM: number;
-  services: {
-    name: string;
-    price: number;
-    durationMinutes: number;
-  }[];
-};
-
-function parseHairdresserProfile(input: unknown): HairdresserProfileInput {
+function parseHairdresserProfile(
+  input: unknown,
+): HairdresserProfileUpdateRequest {
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     throw new RegistrationValidationError("A hairdresser profile is required");
   }
