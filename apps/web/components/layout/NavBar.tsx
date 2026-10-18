@@ -1,16 +1,11 @@
 import Link from "next/link";
-
-import {
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenu,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
+import { NavigationMenu } from "@/components/ui/navigation-menu";
 import { NavBarLink } from "@/types/navbar";
 import { SignInUp } from "../auth/SignInUp";
 import { LoggedInUser } from "../auth/LoggedInUser";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 import { Button } from "@/components/ui/button";
+import { NavBarItems } from "./NavBarItems";
 
 interface NavBarProps {
   links: NavBarLink[];
@@ -54,16 +49,7 @@ export const NavBar = async ({ links }: NavBarProps) => {
     <div className="relative bg-foreground p-4">
       <div className="max-w-6xl mx-auto flex justify-center">
         <NavigationMenu>
-          <NavigationMenuList className="flex gap-3">
-            {links.map((link: NavBarLink) => (
-              <NavigationMenuItem key={link.name}>
-                <NavigationMenuLink
-                  render={<Link href={link.link}>{link.name}</Link>}
-                  className="text-primary-foreground hover:bg-secondary/80 hover:text-accent-foreground"
-                />
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
+          <NavBarItems links={links} />
         </NavigationMenu>
       </div>
 

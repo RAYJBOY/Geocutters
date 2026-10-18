@@ -25,7 +25,7 @@ const NavBarLinks: NavBarLink[] = [
   },
   {
     name: "Contact Us",
-    link: "contact-us",
+    link: "/contact-us",
   },
 ];
 
