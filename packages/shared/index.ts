@@ -4,6 +4,8 @@ export type {
   HairdresserProfileFormService,
   HairdresserProfileResponse,
   HairdresserProfileUpdateRequest,
+  PublicHairdresserProfile,
+  PublicHairdresserProfileResponse,
   HairdresserSearchResponse,
   HairdresserSearchResult,
   HairdresserService,

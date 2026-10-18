@@ -1,5 +1,8 @@
 import { prisma } from "../../lib/prisma.js";
-import type { HairdresserSearchResult } from "@geocutters/shared";
+import type {
+  HairdresserSearchResult,
+  PublicHairdresserProfile,
+} from "@geocutters/shared";
 
 type Coordinates = {
   lat: number;
@@ -76,4 +79,30 @@ export async function findHairdressers({
   return matches
     .sort((a, b) => a.distanceM - b.distanceM)
     .map(({ hairdresser }) => hairdresser);
+}
+
+export async function getPublicHairdresserProfile(
+  hairdresserId: string,
+): Promise<PublicHairdresserProfile | null> {
+  return prisma.hairdresser.findUnique({
+    where: { id: hairdresserId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      bio: true,
+      yearsOfExperience: true,
+      dbsVerified: true,
+      services: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          durationMinutes: true,
+        },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
 }

@@ -59,6 +59,18 @@ export type HairdresserSearchResponse = {
   error?: string;
 };
 
+export type PublicHairdresserProfile = Omit<
+  HairdresserProfile,
+  "serviceCenterLat" | "serviceCenterLng" | "serviceRadiusM" | "services"
+> & {
+  services?: HairdresserProfile["services"];
+};
+
+export type PublicHairdresserProfileResponse = {
+  hairdresser?: PublicHairdresserProfile;
+  error?: string;
+};
+
 export type HairdresserSearchResult = {
   id: string;
   name: string;
