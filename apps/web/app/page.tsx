@@ -3,9 +3,7 @@ import { HowItWorks } from "@/components/common/HowItWorks";
 import { RegisterAsAHairdresser } from "@/components/common/RegisterAsAHairdresser";
 import { WhyChooseUs } from "@/components/common/WhyChooseUs";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -15,21 +13,11 @@ export default function Home() {
         title="Your stylist, at your door"
         description="Mobile. Professional. Personal."
       >
-        <Field>
-          <ButtonGroup>
-            <Input
-              id="input-button-group"
-              placeholder="Your postcode or address..."
-              className="h-12 bg-background"
-            />
-            <Button
-              variant="outline"
-              className="h-12 bg-foreground text-background"
-            >
-              Search
-            </Button>
-          </ButtonGroup>
-        </Field>
+        <Link href="/findHairdresser">
+          <Button className="h-12 bg-background text-foreground hover:bg-foreground hover:text-background">
+            Find hairdresser
+          </Button>
+        </Link>
       </Hero>
       <WhyChooseUs />
       <HowItWorks />
