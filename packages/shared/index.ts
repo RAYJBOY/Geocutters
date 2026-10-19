@@ -15,3 +15,6 @@ export type {
   CompleteRegistrationRequest,
   RegistrationService,
 } from "./types/registration";
+
+export { isServiceName, SERVICE_NAMES } from "./types/services";
+export type { ServiceName } from "./types/services";

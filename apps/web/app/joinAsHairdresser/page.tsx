@@ -23,6 +23,7 @@ export default function RegisterPage() {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [radius, setRadius] = useState(5000);
@@ -43,6 +44,7 @@ export default function RegisterPage() {
         ? user.user_metadata.name.trim()
         : "",
     );
+    setPhone("");
     setLat(null);
     setLng(null);
     setRadius(5000);
@@ -73,7 +75,7 @@ export default function RegisterPage() {
         },
         body: JSON.stringify({
           name,
-          phone: null,
+          phone: phone.trim() || null,
           lat,
           lng,
           radius,
@@ -166,10 +168,11 @@ export default function RegisterPage() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-card rounded-xl p-8 max-w-md text-center border border-border">
           <h2 className="text-2xl font-bold text-foreground mb-2">
-            Application submitted!
+            Submitted!
           </h2>
           <p className="text-muted-foreground mb-6">
-            We&apos;ll review your profile and email you within 48 hours.
+            Thank you for registering as a hairdresser with us. You will now be
+            shown to clients!
           </p>
           <Button className="w-full" onClick={() => router.push("/")}>
             Return home
@@ -226,6 +229,8 @@ export default function RegisterPage() {
             <StepOne
               name={name}
               setName={setName}
+              phone={phone}
+              setPhone={setPhone}
               email={user.email ?? ""}
               onNext={handleNext}
             />

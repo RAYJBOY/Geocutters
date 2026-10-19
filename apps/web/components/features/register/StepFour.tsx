@@ -51,7 +51,7 @@ export default function StepFour({
               I have a valid DBS check
             </Label>
             <p className="text-xs text-muted-foreground mt-1">
-              Customers prefer DBS-verified hairdressers. You'll receive a
+              Customers prefer DBS-verified hairdressers. You&apos;ll receive a
               verified badge on your profile.
             </p>
           </div>

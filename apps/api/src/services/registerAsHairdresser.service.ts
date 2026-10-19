@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma.js";
-import type { CompleteRegistrationRequest } from "@geocutters/shared";
+import { isServiceName, type CompleteRegistrationRequest } from "@geocutters/shared";
 import { RegistrationValidationError } from "./registration.errors";
 
 export type RegisterPayload = CompleteRegistrationRequest;
@@ -83,8 +83,14 @@ function normalizePayload(
     }
 
     const item = service as Record<string, unknown>;
+    const name = requiredString(item.name, `services[${index}].name`);
+    if (!isServiceName(name)) {
+      throw new RegistrationValidationError(
+        `services[${index}].name must be one of the available service options`,
+      );
+    }
     return {
-      name: requiredString(item.name, `services[${index}].name`),
+      name,
       price: finiteNumber(item.price, `services[${index}].price`),
       durationMinutes: positiveInteger(
         item.duration ?? item.durationMinutes,

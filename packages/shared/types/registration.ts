@@ -1,5 +1,7 @@
+import type { ServiceName } from "./services";
+
 export type RegistrationService = {
-  name: string;
+  name: ServiceName | "";
   price: string;
   duration: string;
 };

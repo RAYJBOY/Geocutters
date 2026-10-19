@@ -8,10 +8,18 @@ import type {
   HairdresserProfileResponse,
   HairdresserProfileUpdateRequest,
 } from "@geocutters/shared";
+import { isServiceName, SERVICE_NAMES } from "@geocutters/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useHairdresserAccount } from "@/hooks/useHairdresserAccount";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client";
@@ -363,11 +371,32 @@ function ProfileEditor({ user, accessToken }: { user: User; accessToken: string 
                       <div key={service.id ?? index} className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_8rem_8rem_auto]">
                         <div className="space-y-2">
                           <Label htmlFor={`service-name-${index}`}>Name</Label>
-                          <Input id={`service-name-${index}`} value={service.name} onChange={(event) => {
-                            const services = [...profile.services];
-                            services[index] = { ...service, name: event.target.value };
-                            updateProfile({ services });
-                          }} required />
+                          <Select
+                            value={isServiceName(service.name) ? service.name : ""}
+                            onValueChange={(value) => {
+                              if (value === null) return;
+                              const services = [...profile.services];
+                              services[index] = { ...service, name: value };
+                              updateProfile({ services });
+                            }}
+                          >
+                            <SelectTrigger
+                              id={`service-name-${index}`}
+                              className="w-full"
+                            >
+                              <SelectValue placeholder="Choose a service" />
+                            </SelectTrigger>
+                            <SelectContent
+                              side="bottom"
+                              alignItemWithTrigger={false}
+                            >
+                            {SERVICE_NAMES.map((serviceName) => (
+                                <SelectItem key={serviceName} value={serviceName}>
+                                  {serviceName}
+                                </SelectItem>
+                            ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor={`service-price-${index}`}>Price (£)</Label>
@@ -437,10 +466,15 @@ function profileToRequest(
     serviceCenterLat: Number(profile.serviceCenterLat),
     serviceCenterLng: Number(profile.serviceCenterLng),
     serviceRadiusM: Number(profile.serviceRadiusM),
-    services: profile.services.map((service) => ({
-      name: service.name,
-      price: Number(service.price),
-      durationMinutes: Number(service.durationMinutes),
-    })),
+    services: profile.services.map((service) => {
+      if (!isServiceName(service.name)) {
+        throw new Error("Choose a valid service for each service entry.");
+      }
+      return {
+        name: service.name,
+        price: Number(service.price),
+        durationMinutes: Number(service.durationMinutes),
+      };
+    }),
   };
 }

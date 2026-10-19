@@ -5,11 +5,20 @@ import { Input } from "@/components/ui/input";
 type StepOneProps = {
   name: string;
   setName: (value: string) => void;
+  phone: string;
+  setPhone: (value: string) => void;
   email: string;
   onNext: () => void | Promise<void>;
 };
 
-export const StepOne = ({ name, setName, email, onNext }: StepOneProps) => {
+export const StepOne = ({
+  name,
+  setName,
+  phone,
+  setPhone,
+  email,
+  onNext,
+}: StepOneProps) => {
   return (
     <form
       onSubmit={(event) => {
@@ -37,6 +46,19 @@ export const StepOne = ({ name, setName, email, onNext }: StepOneProps) => {
             type="email"
             value={email}
             readOnly
+            className="bg-background"
+          />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="form-phone">Phone number (optional)</FieldLabel>
+          <Input
+            id="form-phone"
+            type="tel"
+            autoComplete="tel"
+            placeholder="e.g. 07123 456789"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
             className="bg-background"
           />
         </Field>

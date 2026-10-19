@@ -2,8 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
-import type { RegistrationService } from "@geocutters/shared";
+import { SERVICE_NAMES, type RegistrationService } from "@geocutters/shared";
 
 interface StepThreeProps {
   services: RegistrationService[];
@@ -51,15 +58,28 @@ export default function StepThree({
                 <Label htmlFor={`service-name-${index}`} className="text-xs">
                   Service name
                 </Label>
-                <Input
-                  id={`service-name-${index}`}
-                  placeholder="e.g. Women's Haircut & Style"
+                <Select
                   value={service.name}
-                  onChange={(e) =>
-                    onUpdateService(index, "name", e.target.value)
+                  onValueChange={(value) =>
+                    value !== null &&
+                    onUpdateService(index, "name", value)
                   }
-                  className="mt-1.5 text-sm"
-                />
+                >
+                  <SelectTrigger
+                    id={`service-name-${index}`}
+                    aria-label="Service name"
+                    className="mt-1.5 w-full"
+                  >
+                    <SelectValue placeholder="Choose a service" />
+                  </SelectTrigger>
+                  <SelectContent side="bottom" alignItemWithTrigger={false}>
+                    {SERVICE_NAMES.map((serviceName) => (
+                      <SelectItem key={serviceName} value={serviceName}>
+                        {serviceName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -83,7 +103,7 @@ export default function StepThree({
                     htmlFor={`service-duration-${index}`}
                     className="text-xs"
                   >
-                    Duration
+                    Duration (mins)
                   </Label>
                   <Input
                     id={`service-duration-${index}`}

@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma.js";
-import type { HairdresserProfileUpdateRequest } from "@geocutters/shared";
+import { isServiceName, type HairdresserProfileUpdateRequest } from "@geocutters/shared";
 import { RegistrationValidationError } from "./registration.errors.js";
 
 function parseHairdresserProfile(
@@ -68,8 +68,14 @@ function parseHairdresserProfile(
         "Service duration must be a positive integer",
       );
     }
+    const name = requiredString(service.name, `Service ${index + 1} name`);
+    if (!isServiceName(name)) {
+      throw new RegistrationValidationError(
+        `Service ${index + 1} name must be one of the available service options`,
+      );
+    }
     return {
-      name: requiredString(service.name, `Service ${index + 1} name`),
+      name,
       price,
       durationMinutes,
     };

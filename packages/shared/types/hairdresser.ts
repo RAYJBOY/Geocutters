@@ -1,3 +1,5 @@
+import type { ServiceName } from "./services";
+
 export type HairdresserService = {
   id: string;
   name: string;
@@ -51,7 +53,11 @@ export type HairdresserProfileUpdateRequest = {
   serviceCenterLat: number;
   serviceCenterLng: number;
   serviceRadiusM: number;
-  services: Omit<HairdresserService, "id">[];
+  services: {
+    name: ServiceName;
+    price: number;
+    durationMinutes: number;
+  }[];
 };
 
 export type HairdresserSearchResponse = {
