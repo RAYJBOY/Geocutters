@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function useHairdresserFilters() {
   const [hasDbsCheck, setHasDbsCheck] = useState(false);
@@ -10,21 +10,7 @@ export function useHairdresserFilters() {
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
 
-  const filterQuery = useMemo(() => {
-    if (!location) {
-      return null;
-    }
-
-    const params = new URLSearchParams({
-      hasDbsCheck: String(hasDbsCheck),
-      lat: String(location.lat),
-      lng: String(location.lng),
-    });
-
-    return params.toString();
-  }, [hasDbsCheck, location]);
-
-  const findMyLocation = () => {
+  const findMyLocation = useCallback(() => {
     setLocationError("");
 
     if (!navigator.geolocation) {
@@ -52,7 +38,47 @@ export function useHairdresserFilters() {
       },
       { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
     );
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!navigator.permissions?.query) {
+      return;
+    }
+
+    let active = true;
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then((permission) => {
+        if (active && permission.state === "granted") {
+          findMyLocation();
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setLocationError(
+            "Your browser couldn’t restore location access. Use the button to try again.",
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [findMyLocation]);
+
+  const filterQuery = useMemo(() => {
+    if (!location) {
+      return null;
+    }
+
+    const params = new URLSearchParams({
+      hasDbsCheck: String(hasDbsCheck),
+      lat: String(location.lat),
+      lng: String(location.lng),
+    });
+
+    return params.toString();
+  }, [hasDbsCheck, location]);
 
   return {
     hasDbsCheck,
