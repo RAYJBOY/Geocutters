@@ -3,6 +3,8 @@ import { authRoute } from "./routes/auth.route";
 import { hairdresserRoute } from "./routes/hairdresser.route";
 import { userRoute } from "./routes/user.route";
 
+const port = Number(process.env.PORT || 3001);
+
 const app = express();
 app.use(express.json());
 app.use("/api/auth", authRoute);
@@ -13,8 +15,8 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-const server = app.listen(3001, () => {
-  console.log("API running on port 3001");
+const server = app.listen(port, () => {
+  console.log(`API running on port ${port}`);
 });
 
 server.on("error", (err) => {
