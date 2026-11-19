@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Saira, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/layout/NavBar";
 import { NavBarLink } from "@/types/navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const saira = Saira({
+  variable: "--font-saira",
   subsets: ["latin"],
 });
 
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${saira.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body>
         <NavBar links={NavBarLinks} />
