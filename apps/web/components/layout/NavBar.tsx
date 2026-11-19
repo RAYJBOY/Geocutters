@@ -45,6 +45,7 @@ export const NavBar = async ({ links }: NavBarProps) => {
     typeof name === "string" && name.trim()
       ? name.trim()
       : (loggedInUser?.email ?? "Account");
+  const contactLink = links.find((link) => link.link === "/contact-us");
   return (
     <header className="relative border-b border-border bg-background px-4 py-3">
       <div className="mx-auto grid min-h-11 max-w-screen-2xl grid-cols-[1fr_auto] items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
@@ -62,11 +63,21 @@ export const NavBar = async ({ links }: NavBarProps) => {
         </div>
 
         <div className="flex items-center justify-self-end gap-2">
+          {contactLink && (
+            <Button
+              nativeButton={false}
+              render={<Link href={contactLink.link} />}
+              variant="outline"
+              className="h-9 rounded-full border-border bg-card px-3 text-sm text-card-foreground hover:bg-accent md:hidden"
+            >
+              Contact
+            </Button>
+          )}
           {!isHairdresser && (
             <Button
               nativeButton={false}
               render={<Link href="/joinAsHairdresser" />}
-              className="hidden h-9 rounded-full bg-primary px-4 text-primary-foreground hover:bg-primary/90 sm:inline-flex"
+              className="hidden h-9 rounded-full bg-primary px-4 text-primary-foreground hover:bg-primary/90 md:inline-flex"
             >
               Join as a hairdresser
             </Button>

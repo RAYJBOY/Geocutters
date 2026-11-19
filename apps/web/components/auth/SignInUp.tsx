@@ -20,11 +20,14 @@ export const SignInUp = ({ redirectTo }: SignInUpProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger
         render={
-          <Button className="h-9 rounded-full bg-primary px-4 text-primary-foreground hover:bg-primary/90" />
+          <Button
+            aria-label="Sign in or sign up"
+            className="h-9 w-9 rounded-full bg-primary p-0 text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-4"
+          />
         }
       >
-        <User />
-        Sign In/Up
+        <User aria-hidden="true" />
+        <span className="hidden sm:inline">Sign In/Up</span>
       </DialogTrigger>
       <DialogContent>
         <Tabs defaultValue="signUp">
