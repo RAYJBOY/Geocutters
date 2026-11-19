@@ -95,11 +95,11 @@ export default function HairdresserProfilePage() {
         )}
 
         {hairdresser && (
-          <article className="overflow-hidden rounded-2xl border bg-background shadow-sm">
-            <header className="grid gap-6 border-b bg-muted/40 p-6 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-10">
+          <article className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+            <header className="grid gap-6 border-b bg-card p-6 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-10">
               <div
                 aria-hidden="true"
-                className="flex size-24 items-center justify-center rounded-2xl bg-rose-50 text-2xl font-bold text-rose-700 ring-1 ring-rose-100 sm:size-32 sm:text-3xl"
+                className="flex size-24 items-center justify-center rounded-2xl bg-accent text-2xl font-bold text-accent-foreground ring-1 ring-primary/15 sm:size-32 sm:text-3xl"
               >
                 {initials}
               </div>
@@ -139,7 +139,7 @@ export default function HairdresserProfilePage() {
                   <div className="mt-4 space-y-3">
                     <a
                       href={`mailto:${hairdresser.email}`}
-                      className="flex min-w-0 items-center gap-3 rounded-xl border bg-muted/30 p-3 transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      className="flex min-w-0 items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
                       <Mail
                         aria-hidden="true"
@@ -157,7 +157,7 @@ export default function HairdresserProfilePage() {
                     {hairdresser.phone ? (
                       <a
                         href={`tel:${hairdresser.phone.replace(/[^\d+]/g, "")}`}
-                        className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                        className="flex items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                       >
                         <Phone
                           aria-hidden="true"
@@ -173,7 +173,7 @@ export default function HairdresserProfilePage() {
                         </span>
                       </a>
                     ) : (
-                      <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3">
+                      <div className="flex items-center gap-3 rounded-xl border bg-card p-3">
                         <Phone
                           aria-hidden="true"
                           className="size-5 shrink-0 text-muted-foreground"
@@ -224,7 +224,7 @@ export default function HairdresserProfilePage() {
                         aria-hidden="true"
                         className={`size-5 shrink-0 ${
                           hairdresser.dbsVerified
-                            ? "text-emerald-600"
+                            ? "text-primary"
                             : "text-muted-foreground"
                         }`}
                       />

@@ -13,7 +13,7 @@ export function NavBarItems({ links }: { links: NavBarLink[] }) {
   const pathname = usePathname();
 
   return (
-    <NavigationMenuList className="flex gap-3">
+    <NavigationMenuList className="flex gap-6">
       {links.map((link) => {
         const isCurrentPage =
           pathname === link.link ||
@@ -30,7 +30,7 @@ export function NavBarItems({ links }: { links: NavBarLink[] }) {
                   {link.name}
                 </Link>
               }
-              className="text-primary-foreground hover:bg-secondary/80 hover:text-accent-foreground focus:bg-transparent aria-[current=page]:hover:bg-transparent aria-[current=page]:hover:text-primary-foreground aria-[current=page]:focus:bg-transparent aria-[current=page]:data-active:bg-transparent aria-[current=page]:data-active:hover:bg-transparent aria-[current=page]:data-active:focus:bg-transparent"
+              className="rounded-full px-4 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground focus:bg-transparent aria-[current=page]:font-semibold aria-[current=page]:text-foreground aria-[current=page]:hover:bg-muted aria-[current=page]:focus:bg-transparent aria-[current=page]:data-active:bg-transparent"
             />
           </NavigationMenuItem>
         );

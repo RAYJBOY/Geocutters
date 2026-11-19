@@ -33,7 +33,7 @@ export const LoggedInUser = ({ name }: LoggedInUserProps) => {
         render={
           <Button
             variant="ghost"
-            className="max-w-56 text-background hover:bg-background/10 hover:text-background"
+            className="max-w-56 rounded-full text-foreground hover:bg-muted hover:text-foreground"
           />
         }
       >

@@ -20,7 +20,7 @@ export const SignInUp = ({ redirectTo }: SignInUpProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger
         render={
-          <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/80" />
+          <Button className="h-9 rounded-full bg-primary px-4 text-primary-foreground hover:bg-primary/90" />
         }
       >
         <User />

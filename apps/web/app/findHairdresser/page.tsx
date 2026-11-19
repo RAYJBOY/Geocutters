@@ -100,7 +100,7 @@ export default function FindHairdresser() {
         <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
           <aside
             aria-label="Search filters"
-            className="h-fit rounded-xl border bg-background p-4 shadow-sm sm:p-5"
+            className="h-fit rounded-xl border bg-card p-4 shadow-sm sm:p-5"
           >
             <h2 className="text-base font-semibold">Filters</h2>
 
@@ -133,7 +133,7 @@ export default function FindHairdresser() {
                     : "Use my location"}
               </Button>
               {hasLocation && (
-                <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-primary">
                   <Check aria-hidden="true" className="size-3.5" />
                   Location shared
                 </p>

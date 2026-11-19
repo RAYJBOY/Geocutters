@@ -27,16 +27,16 @@ export function HairdresserCard({ hairdresser }: HairdresserCardProps) {
             <div className="flex items-center gap-4">
               <div
                 aria-hidden="true"
-                className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-lg font-bold text-rose-700 ring-1 ring-rose-100"
+                className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-accent text-lg font-bold text-accent-foreground ring-1 ring-primary/15"
               >
                 {initials}
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
-                <h3 className="truncate text-lg font-bold tracking-tight text-stone-900">
+                <h3 className="truncate text-lg font-bold tracking-tight text-foreground">
                   {hairdresser.name}
                 </h3>
                 {hairdresser.yearsOfExperience !== null && (
-                  <p className="mt-1 text-sm font-medium text-stone-500">
+                  <p className="mt-1 text-sm font-medium text-muted-foreground">
                     {hairdresser.yearsOfExperience}{" "}
                     {hairdresser.yearsOfExperience === 1
                       ? "year"
@@ -46,13 +46,13 @@ export function HairdresserCard({ hairdresser }: HairdresserCardProps) {
                 )}
                 <div className="mt-4 flex items-center gap-2">
                   {hairdresser.distanceKm !== undefined && (
-                    <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-xs font-medium text-stone-700">
+                    <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
                       <MapPin aria-hidden="true" className="size-4" />
                       {hairdresser.distanceKm} km away
                     </span>
                   )}
                   {hairdresser.dbsVerified && (
-                    <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                    <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/20 bg-accent px-2.5 py-1 text-xs font-medium text-primary">
                       <Check aria-hidden="true" className="size-4" />
                       DBS
                     </span>

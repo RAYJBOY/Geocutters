@@ -46,25 +46,35 @@ export const NavBar = async ({ links }: NavBarProps) => {
       ? name.trim()
       : (loggedInUser?.email ?? "Account");
   return (
-    <div className="relative bg-foreground p-4">
-      <div className="max-w-6xl mx-auto flex justify-center">
-        <NavigationMenu>
-          <NavBarItems links={links} />
-        </NavigationMenu>
-      </div>
+    <header className="relative border-b border-border bg-background px-4 py-3">
+      <div className="mx-auto grid min-h-11 max-w-screen-2xl grid-cols-[1fr_auto] items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm font-bold tracking-[0.22em] text-foreground"
+        >
+          GEOCUTTERS
+        </Link>
 
-      <div className="flex absolute top-4 right-4 gap-3">
-        {!isHairdresser && (
-          <Button
-            variant="link"
-            className="h-auto p-0 text-background underline-offset-4 hover:text-background/80 hover:no-underline"
-          >
-            <Link href="/joinAsHairdresser">Register as a hairdresser</Link>
-          </Button>
-        )}
-        {!loggedInUser && <SignInUp />}
-        {loggedInUser && <LoggedInUser name={displayName} />}
+        <div className="hidden justify-center md:flex">
+          <NavigationMenu>
+            <NavBarItems links={links} />
+          </NavigationMenu>
+        </div>
+
+        <div className="flex items-center justify-self-end gap-2">
+          {!isHairdresser && (
+            <Button
+              nativeButton={false}
+              render={<Link href="/joinAsHairdresser" />}
+              className="hidden h-9 rounded-full bg-primary px-4 text-primary-foreground hover:bg-primary/90 sm:inline-flex"
+            >
+              Join as a hairdresser
+            </Button>
+          )}
+          {!loggedInUser && <SignInUp />}
+          {loggedInUser && <LoggedInUser name={displayName} />}
+        </div>
       </div>
-    </div>
+    </header>
   );
 };

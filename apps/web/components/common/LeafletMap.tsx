@@ -59,5 +59,5 @@ export default function LeafletMap({ lat, lng, radius }: LeafletMapProps) {
     }).addTo(mapRef.current);
   }, [radius, lat, lng]);
 
-  return <div id="map" className="w-full h-64 rounded-lg border border-border bg-slate-50" />;
+  return <div id="map" className="w-full h-64 rounded-lg border border-border bg-muted" />;
 }
