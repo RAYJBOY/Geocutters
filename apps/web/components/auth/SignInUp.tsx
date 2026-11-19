@@ -10,9 +10,13 @@ import { SignUpForm } from "./SignUpForm";
 
 type SignInUpProps = {
   redirectTo?: string;
+  showLabelOnMobile?: boolean;
 };
 
-export const SignInUp = ({ redirectTo }: SignInUpProps) => {
+export const SignInUp = ({
+  redirectTo,
+  showLabelOnMobile = false,
+}: SignInUpProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -22,12 +26,16 @@ export const SignInUp = ({ redirectTo }: SignInUpProps) => {
         render={
           <Button
             aria-label="Sign in or sign up"
-            className="h-9 w-9 rounded-full bg-primary p-0 text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-4"
+            className={`h-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 ${
+              showLabelOnMobile ? "w-auto px-4" : "w-9 p-0 sm:w-auto sm:px-4"
+            }`}
           />
         }
       >
         <User aria-hidden="true" />
-        <span className="hidden sm:inline">Sign In/Up</span>
+        <span className={showLabelOnMobile ? "" : "hidden sm:inline"}>
+          Sign In/Up
+        </span>
       </DialogTrigger>
       <DialogContent>
         <Tabs defaultValue="signUp">

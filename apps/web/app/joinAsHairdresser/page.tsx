@@ -157,7 +157,10 @@ export default function RegisterPage() {
           hairdresser profile.
         </p>
         <div className="mt-6 flex justify-center">
-          <SignInUp redirectTo="/joinAsHairdresser" />
+          <SignInUp
+            redirectTo="/joinAsHairdresser"
+            showLabelOnMobile
+          />
         </div>
       </div>
     );
